@@ -1,435 +1,330 @@
-import streamlit as st
-
-st.set_page_config(
-    page_title="Fiber Science Lab",
-    page_icon="🧵",
-    layout="wide"
-)
-
-# ---------- COLOR THEME ----------
-st.markdown("""
-<style>
-.stApp {
-    background-color: #F7F6EF;
-    color: #193D32;
-}
-
-[data-testid="stSidebar"] {
-    background-color: #123B32;
-}
-
-[data-testid="stSidebar"] * {
-    color: white !important;
-}
-
-.hero {
-    background: linear-gradient(120deg, #123B32, #23866A);
-    padding: 35px;
-    border-radius: 20px;
-    color: white;
-    margin-bottom: 25px;
-}
-
-.hero h1 {
-    color: white;
-    font-size: 38px;
-}
-
-.hero p {
-    color: #D8EFE5;
-    font-size: 17px;
-}
-
-.card {
-    background: white;
-    border-left: 5px solid #299879;
-    padding: 22px;
-    border-radius: 14px;
-    margin: 12px 0;
-    box-shadow: 0 4px 15px rgba(18,59,50,0.07);
-}
-
-.card h3 {
-    color: #17664F;
-}
-
-.stButton > button {
-    background: #23866A;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-.stButton > button:hover {
-    background: #123B32;
-    color: white;
-}
-
-div[data-testid="stMetric"] {
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
-    border-bottom: 3px solid #299879;
-}
-
-h1, h2, h3 {
-    color: #123B32;
-}
-</style>
-""", unsafe_allow_html=True)
-
-
-# ---------- FIBER DATABASE ----------
-fibers = {
-    "Cotton": {
-        "type": "Natural Cellulosic Fiber",
-        "source": "Cotton plant seed hairs",
-        "composition": "Mainly cellulose",
-        "properties": [
-            "Good moisture absorption",
-            "Comfortable and breathable",
-            "Good strength, especially when wet",
-            "Can wrinkle easily"
-        ],
-        "uses": "Shirts, bedsheets, towels and denim",
-        "test": "Burns readily and leaves soft gray ash. Burn tests must only be conducted under laboratory supervision."
-    },
-
-    "Wool": {
-        "type": "Natural Protein Fiber",
-        "source": "Fleece of sheep",
-        "composition": "Keratin protein",
-        "properties": [
-            "Good warmth and insulation",
-            "Naturally crimped",
-            "Good moisture absorption",
-            "May shrink or felt during unsuitable washing"
-        ],
-        "uses": "Sweaters, coats, blankets and carpets",
-        "test": "Burning behavior may include a hair-like odor and crushable ash. Confirm using approved laboratory procedures."
-    },
-
-    "Silk": {
-        "type": "Natural Protein Fiber",
-        "source": "Cocoon of the silkworm",
-        "composition": "Mainly fibroin protein",
-        "properties": [
-            "Smooth and lustrous",
-            "Fine and lightweight",
-            "Good drape",
-            "Sensitive to some chemicals and sunlight"
-        ],
-        "uses": "Scarves, dresses, ties and luxury fabrics",
-        "test": "Has a natural sheen and a smooth filament appearance."
-    },
-
-    "Flax": {
-        "type": "Natural Bast Fiber",
-        "source": "Stem of the flax plant",
-        "composition": "Mainly cellulose",
-        "properties": [
-            "High strength",
-            "Good moisture absorption",
-            "Cool and comfortable",
-            "Wrinkles easily"
-        ],
-        "uses": "Linen clothing, tablecloths and home textiles",
-        "test": "Microscopic examination can show characteristic nodes along the fiber."
-    },
-
-    "Polyester": {
-        "type": "Synthetic Fiber",
-        "source": "Manufactured from polymer materials",
-        "composition": "Polyester polymer, commonly PET",
-        "properties": [
-            "Good wrinkle resistance",
-            "Low moisture absorption",
-            "Good dimensional stability",
-            "Dries relatively quickly"
-        ],
-        "uses": "Sportswear, curtains, shirts and blended fabrics",
-        "test": "Microscopy and suitable chemical identification methods help distinguish polyester."
-    },
-
-    "Nylon": {
-        "type": "Synthetic Polyamide Fiber",
-        "source": "Manufactured polymer",
-        "composition": "Polyamide",
-        "properties": [
-            "High strength",
-            "Good abrasion resistance",
-            "Lightweight",
-            "Thermoplastic"
-        ],
-        "uses": "Ropes, hosiery, sportswear and carpets",
-        "test": "Fiber identification may use microscopy and validated chemical methods."
-    },
-
-    "Viscose": {
-        "type": "Regenerated Cellulosic Fiber",
-        "source": "Regenerated cellulose, commonly from wood pulp",
-        "composition": "Cellulose",
-        "properties": [
-            "Soft feel",
-            "Good moisture absorption",
-            "Good drape",
-            "May lose strength when wet"
-        ],
-        "uses": "Dresses, linings, shirts and blended fabrics",
-        "test": "Microscopy and suitable laboratory methods are used for identification."
-    },
-
-    "Acrylic": {
-        "type": "Synthetic Fiber",
-        "source": "Manufactured polymer",
-        "composition": "Mainly polyacrylonitrile",
-        "properties": [
-            "Lightweight",
-            "Good warmth",
-            "Wool-like appearance",
-            "Good color retention"
-        ],
-        "uses": "Sweaters, blankets, knitwear and upholstery",
-        "test": "Microscopy and approved analytical methods help confirm fiber identity."
-    }
-}
-
-
-# ---------- HEADER ----------
-st.markdown("""
-<div class="hero">
-    <h1>🧵 Fiber Science Lab</h1>
-    <p>Explore Fibers • Study Properties • Learn Identification</p>
-    <p>Textile Engineering | Second Year</p>
-</div>
-""", unsafe_allow_html=True)
-
-col1, col2, col3 = st.columns(3)
-
-col1.metric("Fiber Library", len(fibers))
-col2.metric("Fiber Categories", 3)
-col3.metric("Learning Mode", "Student")
-
-
-# ---------- SIDEBAR ----------
-st.sidebar.title("🧪 Fiber Science")
-
-page = st.sidebar.radio(
-    "Select Section",
-    [
-        "Fiber Explorer",
-        "Fiber Classification",
-        "Fiber Comparison",
-        "Fiber Quiz"
-    ]
-)
-
-
-# ---------- FIBER EXPLORER ----------
-if page == "Fiber Explorer":
-
-    st.title("🔬 Fiber Explorer")
-    st.write("Select a fiber to explore its source, composition, properties and uses.")
-
-    selected = st.selectbox("Choose Fiber", list(fibers.keys()))
-    data = fibers[selected]
-
-    st.markdown(f"""
-    <div class="card">
-        <h3>{selected}</h3>
-        <p><b>Fiber Type:</b> {data['type']}</p>
-        <p><b>Source:</b> {data['source']}</p>
-        <p><b>Composition:</b> {data['composition']}</p>
-        <p><b>Common Uses:</b> {data['uses']}</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.subheader("Important Properties")
-
-    for prop in data["properties"]:
-        st.write("✓", prop)
-
-    st.subheader("Identification Note")
-    st.info(data["test"])
-
-    st.warning(
-        "Identification notes are introductory only. "
-        "Use your laboratory manual and instructor-approved methods "
-        "for reliable fiber identification."
-    )
-
-
-# ---------- CLASSIFICATION ----------
-elif page == "Fiber Classification":
-
-    st.title("🌿 Classification of Textile Fibers")
-
-    categories = {
-        "Natural Fibers": [
-            "Cotton", "Wool", "Silk", "Flax"
-        ],
-        "Synthetic Fibers": [
-            "Polyester", "Nylon", "Acrylic"
-        ],
-        "Regenerated Fibers": [
-            "Viscose"
-        ]
-    }
-
-    for category, items in categories.items():
-        st.markdown(f"""
-        <div class="card">
-            <h3>{category}</h3>
-            <p>{", ".join(items)}</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.subheader("Basic Concepts")
-
-    with st.expander("What is a textile fiber?"):
-        st.write(
-            "A textile fiber is a fine material with suitable length, "
-            "strength and flexibility that can be processed into yarn or fabric."
-        )
-
-    with st.expander("What are natural fibers?"):
-        st.write(
-            "Natural fibers are obtained from plants, animals or minerals. "
-            "Cotton, wool and silk are common examples."
-        )
-
-    with st.expander("What are man-made fibers?"):
-        st.write(
-            "Man-made fibers are produced through industrial processes. "
-            "They include synthetic fibers such as polyester and nylon, "
-            "and regenerated fibers such as viscose."
-        )
-
-
-# ---------- COMPARISON ----------
-elif page == "Fiber Comparison":
-
-    st.title("📊 Compare Two Fibers")
-
-    fiber1 = st.selectbox(
-        "Select First Fiber",
-        list(fibers.keys()),
-        key="fiber1"
-    )
-
-    fiber2 = st.selectbox(
-        "Select Second Fiber",
-        list(fibers.keys()),
-        index=4,
-        key="fiber2"
-    )
-
-    if fiber1 == fiber2:
-        st.info("Select two different fibers for comparison.")
-    else:
-        a = fibers[fiber1]
-        b = fibers[fiber2]
-
-        st.subheader("Comparison Table")
-
-        st.table({
-            "Feature": [
-                "Type",
-                "Source",
-                "Composition",
-                "Properties",
-                "Common Uses"
-            ],
-            fiber1: [
-                a["type"],
-                a["source"],
-                a["composition"],
-                ", ".join(a["properties"]),
-                a["uses"]
-            ],
-            fiber2: [
-                b["type"],
-                b["source"],
-                b["composition"],
-                ", ".join(b["properties"]),
-                b["uses"]
-            ]
-        })
-
-
-# ---------- QUIZ ----------
-elif page == "Fiber Quiz":
-
-    st.title("📝 Test Your Knowledge")
-
-    questions = [
-        {
-            "q": "Which fiber mainly consists of cellulose?",
-            "options": ["Wool", "Cotton", "Silk", "Nylon"],
-            "answer": "Cotton"
-        },
-        {
-            "q": "Which fiber is obtained from sheep?",
-            "options": ["Flax", "Cotton", "Wool", "Viscose"],
-            "answer": "Wool"
-        },
-        {
-            "q": "Which is a synthetic fiber?",
-            "options": ["Silk", "Cotton", "Flax", "Polyester"],
-            "answer": "Polyester"
-        },
-        {
-            "q": "Which fiber is regenerated from cellulose?",
-            "options": ["Viscose", "Nylon", "Wool", "Silk"],
-            "answer": "Viscose"
-        },
-        {
-            "q": "Which fiber is a natural protein fiber?",
-            "options": ["Polyester", "Cotton", "Silk", "Viscose"],
-            "answer": "Silk"
+```html
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Form Studio & Code Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        forest: '#123B32',
+                        greenLab: '#19745E',
+                        mintLab: '#DDEFE7',
+                        creamLab: '#F6F7F1',
+                        inkLab: '#1B352E'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
         }
-    ]
+    </script>
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        .dark .glass { background: rgba(18, 59, 50, 0.9); backdrop-filter: blur(10px); }
+        input, select, textarea { transition: all 0.2s ease; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-full flex flex-col font-sans transition-colors duration-300">
 
-    with st.form("fiber_quiz"):
-        responses = []
+    <header class="sticky top-0 z-50 glass border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-emerald-600 text-white p-2 rounded-xl shadow-md">
+                    <i class="fa-solid fa-file-lines text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight leading-none">TextForm <span class="text-emerald-600 dark:text-emerald-400">Studio</span></h1>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Builder, Live Preview & Code Generator</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="switchTab('builder')" id="btnBuilder" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-sm transition">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Form Builder
+                </button>
+                <button onclick="switchTab('code')" id="btnCode" class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-code mr-1.5"></i> Code & Export
+                </button>
+                <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Toggle Theme">
+                    <i id="themeIcon" class="fa-solid fa-moon text-slate-600 dark:text-slate-300"></i>
+                </button>
+            </div>
+        </div>
+    </header>
 
-        for i, question in enumerate(questions):
-            st.markdown(f"**{i + 1}. {question['q']}**")
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Tab 1: Form Builder & Live Preview -->
+        <div id="tabBuilder" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Control Panel -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                        <i class="fa-solid fa-sliders"></i> Form Configuration
+                    </h2>
 
-            response = st.radio(
-                "Choose your answer:",
-                question["options"],
-                key=f"question_{i}"
-            )
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Form Title</label>
+                            <input type="text" id="formTitleInput" value="Student Lab Submission" oninput="updatePreview()" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
 
-            responses.append(response)
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Form Description / Subtitle</label>
+                            <input type="text" id="formDescInput" value="Fill in your details and experiment data below." oninput="updatePreview()" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
 
-        submitted = st.form_submit_button("Check My Answers")
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Accent Theme</label>
+                                <select id="formTheme" onchange="updatePreview()" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    <option value="emerald">Emerald Forest</option>
+                                    <option value="indigo">Indigo Corporate</option>
+                                    <option value="amber">Amber Warmth</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Button Alignment</label>
+                                <select id="buttonAlign" onchange="updatePreview()" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    <option value="right">Right Aligned</option>
+                                    <option value="left">Left Aligned</option>
+                                    <option value="full">Full Width</option>
+                                </select>
+                            </div>
+                        </div>
 
-    if submitted:
-        score = sum(
-            responses[i] == questions[i]["answer"]
-            for i in range(len(questions))
-        )
+                        <div class="pt-2 border-t border-slate-200 dark:border-slate-800">
+                            <label class="block text-sm font-medium mb-2">Form Fields Included:</label>
+                            <div class="space-y-2 text-sm">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="fieldStudentName" checked onchange="updatePreview()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                    <span>Student Name</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="fieldRollNo" checked onchange="updatePreview()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                    <span>Roll Number / ID</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="fieldSubject" checked onchange="updatePreview()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                    <span>Subject / Category (Dropdown)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="fieldDate" checked onchange="updatePreview()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                    <span>Submission Date</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="fieldComments" checked onchange="updatePreview()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                    <span>Comments / Notes (Textarea)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        st.success(f"Your score: {score} / {len(questions)}")
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                    <h3 class="font-bold text-md mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-lightbulb text-amber-500"></i> Quick Copy Options
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Export or copy your live generated form code instantly to clipboard or download as HTML.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="copyGeneratedCode()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <i id="copyMainIcon" class="fa-solid fa-copy"></i> <span id="copyMainText">Copy HTML Code</span>
+                        </button>
+                        <button onclick="downloadHtmlFile()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-download"></i> Download .html
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-        for i, question in enumerate(questions):
-            if responses[i] == question["answer"]:
-                st.write(f"✅ Question {i + 1}: Correct")
-            else:
-                st.write(
-                    f"❌ Question {i + 1}: "
-                    f"Correct answer: {question['answer']}"
-                )
+            <!-- Right Live Preview Panel -->
+            <div class="lg:col-span-7">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden sticky top-24">
+                    <div class="bg-slate-100 dark:bg-slate-800 px-6 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        </div>
+                        <span class="text-xs font-mono text-slate-500 dark:text-slate-400">Live Interactive Preview</span>
+                    </div>
 
+                    <div class="p-6 sm:p-8" id="previewContainer">
+                        <!-- Dynamic preview rendered here -->
+                    </div>
 
-# ---------- FOOTER ----------
-st.markdown("---")
-st.markdown(
-    "<div style='text-align:center;color:#52746A;padding:15px;'>"
-    "Fiber Science Lab Assistant | Textile Engineering | Second Year"
-    "</div>",
-    unsafe_allow_html=True
-)i
+                    <!-- Submission Result Box -->
+                    <div id="resultBox" class="hidden mx-6 mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-sm">
+                        <div class="font-bold text-emerald-800 dark:text-emerald-300 mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> Form Submitted Successfully!
+                        </div>
+                        <div id="resultContent" class="text-emerald-700 dark:text-emerald-400 font-mono text-xs space-y-1"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Tab 2: Code & Export -->
+        <div id="tabCode" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                            <i class="fa-solid fa-code"></i> Generated HTML Source Code
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Self-contained, responsive, and ready to paste into any project or web editor.</p>
+                    </div>
+                    <button onclick="copyCodeViewer()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 px-3 rounded-xl transition flex items-center gap-1.5">
+                        <i id="codeCopyIcon" class="fa-solid fa-copy"></i> <span id="codeCopyText">Copy Code</span>
+                    </button>
+                </div>
+                <div class="relative">
+                    <pre id="codeOutput" class="bg-slate-950 text-slate-200 p-4 rounded-xl text-xs font-mono overflow-x-auto h-[500px] border border-slate-800"></pre>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-auto py-6 text-center text-xs text-slate-500 border-t border-slate-200 dark:border-slate-800">
+        <p>&copy; 2026 TextForm Studio. Built for fast web prototyping & student workflows.</p>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            html.classList.toggle('dark');
+            if (html.classList.contains('dark')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+
+        // Tab Switcher
+        function switchTab(tab) {
+            const btnBuilder = document.getElementById('btnBuilder');
+            const btnCode = document.getElementById('btnCode');
+            const tabBuilder = document.getElementById('tabBuilder');
+            const tabCode = document.getElementById('tabCode');
+
+            if (tab === 'builder') {
+                btnBuilder.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-sm transition";
+                btnCode.className = "px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition";
+                tabBuilder.classList.remove('hidden');
+                tabCode.classList.add('hidden');
+            } else {
+                btnCode.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-sm transition";
+                btnBuilder.className = "px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition";
+                tabCode.classList.remove('hidden');
+                tabBuilder.classList.add('hidden');
+                generateCodeString();
+            }
+        }
+
+        // Generate Form HTML String dynamically
+        function getFormHtml() {
+            const title = document.getElementById('formTitleInput').value || 'Text Form';
+            const desc = document.getElementById('formDescInput').value || '';
+            const theme = document.getElementById('formTheme').value;
+            const align = document.getElementById('buttonAlign').value;
+
+            const hasName = document.getElementById('fieldStudentName').checked;
+            const hasRoll = document.getElementById('fieldRollNo').checked;
+            const hasSubject = document.getElementById('fieldSubject').checked;
+            const hasDate = document.getElementById('fieldDate').checked;
+            const hasComments = document.getElementById('fieldComments').checked;
+
+            let accentBg = 'bg-emerald-600 hover:bg-emerald-700';
+            if (theme === 'indigo') accentBg = 'bg-indigo-600 hover:bg-indigo-700';
+            if (theme === 'amber') accentBg = 'bg-amber-600 hover:bg-amber-700';
+
+            let alignClass = 'text-right';
+            if (align === 'left') alignClass = 'text-left';
+            if (align === 'full') alignClass = 'text-center';
+
+            let fieldsHtml = '';
+
+            if (hasName) {
+                fieldsHtml += `
+                <div>
+                    <label class="block text-sm font-medium mb-1">Full Name</label>
+                    <input type="text" id="inputName" placeholder="Enter full name" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>`;
+            }
+
+            if (hasRoll) {
+                fieldsHtml += `
+                <div>
+                    <label class="block text-sm font-medium mb-1">Roll Number / ID</label>
+                    <input type="text" id="inputRoll" placeholder="e.g. 2026-TX-041" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>`;
+            }
+
+            if (hasSubject) {
+                fieldsHtml += `
+                <div>
+                    <label class="block text-sm font-medium mb-1">Subject / Category</label>
+                    <select id="inputSubject" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <option value="Fiber Science">Fiber Science Lab</option>
+                        <option value="Yarn Testing">Yarn Testing Analysis</option>
+                        <option value="Fabric Testing">Fabric Testing Report</option>
+                        <option value="General Assignment">General Assignment</option>
+                    </select>
+                </div>`;
+            }
+
+            if (hasDate) {
+                fieldsHtml += `
+                <div>
+                    <label class="block text-sm font-medium mb-1">Submission Date</label>
+                    <input type="date" id="inputDate" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>`;
+            }
+
+            if (hasComments) {
+                fieldsHtml += `
+                <div>
+                    <label class="block text-sm font-medium mb-1">Notes / Comments</label>
+                    <textarea id="inputComments" rows="3" placeholder="Enter observations or remarks..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                </div>`;
+            }
+
+            return `
+            <div class="space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight mb-1">${title}</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">${desc}</p>
+                </div>
+                <form onsubmit="handleFormSubmit(event)" class="space-y-4">
+                    ${fieldsHtml}
+                    <div class="${alignClass} pt-2">
+                        <button type="submit" class="${accentBg} text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition shadow-sm ${align === 'full' ? 'w-full' : ''}">
+                            Submit Record
+                        </button>
+                    </div>
+                </form>
+            </div>`;
+        }
+
+        // Update Live Preview
+        function updatePreview() {
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = getFo
